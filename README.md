@@ -1,2 +1,2 @@
 # Password-Manager
- End-to-end encrypted password manager with Double Ratchet support 
+ Secure Password Manager with AES-GCM Encryption 
