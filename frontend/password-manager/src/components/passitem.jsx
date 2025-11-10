@@ -5,26 +5,34 @@ function PasswordItem({ site, username, password }) {
 
   const copyPassword = () => {
     navigator.clipboard.writeText(password);
-    alert("Password copied to clipboard!");
+    alert(" Password copied to clipboard!");
   };
 
   return (
-    <div className="bg-white p-4 rounded shadow-md flex justify-between items-center">
+    <div className="bg-gradient-to-r from-purple-900 to-purple-700 
+                    p-4 rounded-2xl shadow-lg border border-purple-500 
+                    flex justify-between items-center hover:shadow-purple-600/50 
+                    transition duration-300 ease-in-out">
       <div>
-        <h3 className="font-bold">{site}</h3>
-        <p>{username}</p>
-        <p>{show ? password : "••••••••"}</p>
+        <h3 className="font-bold text-lg text-purple-200">{site}</h3>
+        <p className="text-gray-300 text-sm">{username}</p>
+        <p className="text-gray-100 text-md tracking-widest mt-1">
+          {show ? password : "••••••••"}
+        </p>
       </div>
+
       <div className="flex gap-2">
         <button
           onClick={() => setShow(!show)}
-          className="bg-blue-500 text-white px-2 py-1 rounded"
+          className="bg-purple-600 hover:bg-purple-500 text-white px-3 py-1.5 
+                     rounded-xl transition-colors"
         >
           {show ? "Hide" : "Show"}
         </button>
         <button
           onClick={copyPassword}
-          className="bg-gray-500 text-white px-2 py-1 rounded"
+          className="bg-purple-200 hover:bg-black text-black px-3 py-1.5 
+                     rounded-xl transition-colors"
         >
           Copy
         </button>

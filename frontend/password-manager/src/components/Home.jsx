@@ -61,16 +61,16 @@ export default function HomePage({ goToLogin }) {
         {/* Right-side Icons */}
         <div className="hidden md:flex flex-wrap justify-center gap-6 mt-12 md:mt-0">
           <div className="p-6 bg-purple-900/20 rounded-2xl border border-purple-700/40">
-            <Shield size={48} className="text-purple-400" />
+            <Shield size={70} className="text-purple-400" />
           </div>
           <div className="p-6 bg-purple-900/20 rounded-2xl border border-purple-700/40">
-            <Lock size={48} className="text-purple-400" />
+            <Lock size={70} className="text-purple-400" />
           </div>
           <div className="p-6 bg-purple-900/20 rounded-2xl border border-purple-700/40">
-            <KeyRound size={48} className="text-purple-400" />
+            <KeyRound size={70} className="text-purple-400" />
           </div>
           <div className="p-6 bg-purple-900/20 rounded-2xl border border-purple-700/40">
-            <Fingerprint size={48} className="text-purple-400" />
+            <Fingerprint size={70} className="text-purple-400" />
           </div>
         </div>
       </main>
