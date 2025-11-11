@@ -35,6 +35,27 @@ import {
  * Implements all cryptographic security measures specified in the project.
  */
 export class Keychain {
+  /**
+   * For testing: derive and print the PBKDF2 master key for a given password and salt.
+   * Output is Base64 (can be changed to hex if needed).
+   */
+  static async printMasterKey(password, salt = null, iterations = PBKDF2_ITERATIONS) {
+    if (!salt) salt = generateSalt(SALT_LENGTH);
+    const masterKey = await deriveMasterKey(password, salt, iterations);
+    // Export raw key material
+    const raw = await crypto.subtle.exportKey('raw', masterKey);
+    // Convert to Base64
+    const base64 = btoa(String.fromCharCode(...new Uint8Array(raw)));
+    console.log('PBKDF2 output (master key):', base64);
+    return base64;
+  }
+  /**
+   * Returns a description of PBKDF2 rounds and their security purpose.
+   * For testing/documentation only.
+   */
+  static pbkdf2Info() {
+    return `PBKDF2 performed ${PBKDF2_ITERATIONS.toLocaleString()} rounds of cryptographic hashing on your password combined with the salt. Why so many rounds? To make it painfully slow for attackers trying to guess your password. If someone tries to brute-force your password by guessing millions of possibilities, each guess takes about half a second to verify. This turns a quick attack into something that would take years.`;
+  }
   constructor(aesKey, hmacKey, kvs = {}, salt = null, iterations = PBKDF2_ITERATIONS) {
     this.aesKey = aesKey;           // AES-GCM key for password encryption
     this.hmacKey = hmacKey;         // HMAC key for domain hashing
