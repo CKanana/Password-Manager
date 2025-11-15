@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import LoginForm from "./components/Login";
-import HomePage from "./components/Home";
-import AddVault from "./components/vault";
-import VaultList from "./components/vaultlist";
-import VaultDetail from "./components/vaultdetail"; 
+import Dashboard from "./components/Dashboard";
+import HomePage from "./components/Home"; 
 
 function App() {
   const [user, setUser] = useState(null);

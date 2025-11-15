@@ -4,6 +4,23 @@ function AddPasswordForm({ addPassword }) {
   const [site, setSite] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [strength, setStrength] = useState(0);
+
+  // Simple strength meter (length + variety)
+  function calculateStrength(pw) {
+    let score = 0;
+    if (pw.length > 7) score++;
+    if (/[A-Z]/.test(pw)) score++;
+    if (/[0-9]/.test(pw)) score++;
+    if (/[^A-Za-z0-9]/.test(pw)) score++;
+    return score;
+  }
+
+  const handlePasswordChange = (e) => {
+    const val = e.target.value;
+    setPassword(val);
+    setStrength(calculateStrength(val));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -11,6 +28,7 @@ function AddPasswordForm({ addPassword }) {
     setSite("");
     setUsername("");
     setPassword("");
+    setStrength(0);
   };
 
   return (
@@ -42,16 +60,27 @@ function AddPasswordForm({ addPassword }) {
         required
       />
 
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        className="flex-1 min-w-[180px] p-3 rounded-lg bg-black/40 border border-purple-700/40 
-                   text-gray-200 placeholder-purple-300 focus:outline-none focus:ring-2 
-                   focus:ring-purple-500 transition"
-        required
-      />
+
+      <div className="flex flex-col flex-1 min-w-[180px]">
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={handlePasswordChange}
+          className="p-3 rounded-lg bg-black/40 border border-purple-700/40 text-gray-200 placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
+          required
+        />
+        <div className="mt-2 w-full">
+          <div className={`h-2 rounded-full transition-all duration-300 ${strength === 0 ? 'bg-gray-700' : strength === 1 ? 'bg-red-500' : strength === 2 ? 'bg-yellow-500' : strength === 3 ? 'bg-blue-500' : 'bg-green-500'}`}></div>
+          <div className="text-xs text-purple-300 mt-1">
+            {strength === 0 && 'Enter a password'}
+            {strength === 1 && 'Weak'}
+            {strength === 2 && 'Medium'}
+            {strength === 3 && 'Strong'}
+            {strength === 4 && 'Very Strong'}
+          </div>
+        </div>
+      </div>
 
       <button
         type="submit"
