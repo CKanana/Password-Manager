@@ -2,10 +2,16 @@ import React, { useState } from "react";
 
 function PasswordItem({ site, username, password }) {
   const [show, setShow] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const copyPassword = () => {
     navigator.clipboard.writeText(password);
-    alert(" Password copied to clipboard!");
+    setCopied(true);
+    setTimeout(() => {
+      setCopied(false);
+      // Attempt to clear clipboard after 3s (browser security may block)
+      navigator.clipboard.writeText("");
+    }, 3000);
   };
 
   return (
@@ -21,21 +27,24 @@ function PasswordItem({ site, username, password }) {
         </p>
       </div>
 
-      <div className="flex gap-2">
-        <button
-          onClick={() => setShow(!show)}
-          className="bg-purple-600 hover:bg-purple-500 text-white px-3 py-1.5 
-                     rounded-xl transition-colors"
-        >
-          {show ? "Hide" : "Show"}
-        </button>
-        <button
-          onClick={copyPassword}
-          className="bg-purple-200 hover:bg-black text-black px-3 py-1.5 
-                     rounded-xl transition-colors"
-        >
-          Copy
-        </button>
+      <div className="flex flex-col gap-2 items-end">
+        <div className="flex gap-2">
+          <button
+            onClick={() => setShow(!show)}
+            className="bg-purple-600 hover:bg-purple-500 text-white px-3 py-1.5 rounded-xl transition-colors"
+          >
+            {show ? "Hide" : "Show"}
+          </button>
+          <button
+            onClick={copyPassword}
+            className="bg-purple-200 hover:bg-black text-black px-3 py-1.5 rounded-xl transition-colors"
+          >
+            Copy
+          </button>
+        </div>
+        {copied && (
+          <div className="text-green-400 text-xs mt-1">Copied! Clipboard will clear in 3s.</div>
+        )}
       </div>
     </div>
   );

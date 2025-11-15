@@ -1,7 +1,7 @@
 import React from 'react';
 import { Shield, Lock, KeyRound, Fingerprint } from "lucide-react";
 
-export default function HomePage({ goToLogin }) {
+export default function HomePage({ goToLogin, goToDemo }) {
   return (
 <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-6 md:px-12 relative overflow-hidden"> {/* Background glow */} <div className="absolute inset-0 bg-gradient-to-b from-purple-900/30 via-black to-black pointer-events-none" />
  <div className="absolute -top-40 -left-40 w-[500px] h-[500px] bg-purple-700/40 blur-3xl rounded-full" />
@@ -50,6 +50,13 @@ export default function HomePage({ goToLogin }) {
               className="bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded-full font-semibold transition"
             >
               Get Started Free →
+            </button>
+
+            <button
+              onClick={goToDemo}
+              className="border border-purple-500 text-purple-400 hover:bg-purple-500/10 px-6 py-3 rounded-full font-semibold transition"
+            >
+              Demo
             </button>
 
             <button className="border border-purple-500 text-purple-400 hover:bg-purple-500/10 px-6 py-3 rounded-full font-semibold transition">
