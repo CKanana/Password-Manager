@@ -1,52 +1,76 @@
 import React, { useState } from "react";
 import { Key } from "lucide-react";
 
-function LoginForm({ setUser }) {
+function LoginForm({ setUser, onVaultReady }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-const handleLogin = async (e) => {
-  e.preventDefault();
+  const [loading, setLoading] = useState(false);
 
-  try {
-    const res = await fetch("http://localhost:5000/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password })
-    });
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    if (!email || !password) return;
 
-    const data = await res.json();
+    setLoading(true);
+    try {
+      // 1. Login
+      const loginRes = await fetch("http://localhost:5000/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (!res.ok) {
-      alert(data.message || "Login failed");
-      return;
+      if (!loginRes.ok) {
+        const errData = await loginRes.json();
+        alert(errData.message || "Login failed");
+        setLoading(false);
+        return;
+      }
+
+      const loginData = await loginRes.json();
+      setUser(loginData.user);
+
+      // 2. Initialize vault
+      const vaultRes = await fetch("http://localhost:5000/api/vault/init", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ masterPassword: password, loadExisting: true }),
+      });
+
+      if (!vaultRes.ok) {
+        const errData = await vaultRes.json();
+        alert(errData.error || "Failed to initialize vault");
+        setLoading(false);
+        return;
+      }
+
+      const vaultData = await vaultRes.json();
+      console.log("Vault status:", vaultData.message);
+
+      // Notify parent component that vault is ready
+      if (onVaultReady) onVaultReady();
+
+    } catch (err) {
+      console.error("Login error:", err);
+      alert("Something went wrong. Try again.");
+    } finally {
+      setLoading(false);
     }
+  };
 
-    // Save the logged-in user
-    setUser(data.user);  
-  } catch (err) {
-    console.error("Login error:", err);
-    alert("Something went wrong. Try again.");
-  }
-};
-
-  
   return (
     <div className="relative h-screen w-screen flex items-center justify-center overflow-hidden
                     bg-gradient-to-br from-purple-900 via-black to-purple-800">
 
-      {/* Animated Background Glows */}
-      <div className="absolute w-[500px] h-[500px] bg-purple-700/50 rounded-full filter blur-3xl 
-                      animate-ping-slow top-[-200px] left-[-200px]" />
-      <div className="absolute w-[600px] h-[600px] bg-purple-500/40 rounded-full filter blur-3xl 
-                      animate-ping-slower bottom-[-300px] right-[-300px]" />
-      <div className="absolute w-[400px] h-[400px] bg-purple-600/30 rounded-full filter blur-3xl 
-                      animate-ping-slow top-[100px] right-[-150px]" />
+      {/* Animated Background */}
+      <div className="absolute w-[500px] h-[500px] bg-purple-700/50 rounded-full filter blur-3xl animate-ping-slow top-[-200px] left-[-200px]" />
+      <div className="absolute w-[600px] h-[600px] bg-purple-500/40 rounded-full filter blur-3xl animate-ping-slower bottom-[-300px] right-[-300px]" />
+      <div className="absolute w-[400px] h-[400px] bg-purple-600/30 rounded-full filter blur-3xl animate-ping-slow top-[100px] right-[-150px]" />
 
-      {/* Login Form covering entire screen */}
+      {/* Login Form */}
       <form
         onSubmit={handleLogin}
         className="relative z-10 flex flex-col items-center justify-center h-full w-full
-                   bg-black/40 backdrop-blur-xl border border-purple-700/40 text-gray-200 p-8"
+                   bg-black/40 backdrop-blur-xl border border-purple-700/40 text-gray-200 p-8 max-w-md"
       >
         <div className="flex items-center justify-center mb-6">
           <Key size={60} className="text-purple-400 animate-bounce-slow" />
@@ -64,7 +88,7 @@ const handleLogin = async (e) => {
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full max-w-md p-4 mb-4 rounded-lg bg-black/40 border border-purple-700/40
+          className="w-full p-4 mb-4 rounded-lg bg-black/40 border border-purple-700/40
                      text-gray-200 placeholder-purple-300 focus:outline-none focus:ring-2
                      focus:ring-purple-500 transition"
           required
@@ -75,7 +99,7 @@ const handleLogin = async (e) => {
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full max-w-md p-4 mb-6 rounded-lg bg-black/40 border border-purple-700/40
+          className="w-full p-4 mb-6 rounded-lg bg-black/40 border border-purple-700/40
                      text-gray-200 placeholder-purple-300 focus:outline-none focus:ring-2
                      focus:ring-purple-500 transition"
           required
@@ -83,10 +107,12 @@ const handleLogin = async (e) => {
 
         <button
           type="submit"
-          className="w-full max-w-md bg-purple-600 hover:bg-purple-700 text-gray-100 py-4 rounded-full
-                     font-semibold transition-all duration-300 shadow-lg hover:shadow-purple-600/40"
+          disabled={loading}
+          className={`w-full bg-purple-600 hover:bg-purple-700 text-gray-100 py-4 rounded-full
+                      font-semibold transition-all duration-300 shadow-lg hover:shadow-purple-600/40
+                      ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
         >
-          Log In
+          {loading ? "Logging in..." : "Log In"}
         </button>
 
         <p className="text-center text-lg text-gray-400 mt-6">
@@ -97,7 +123,7 @@ const handleLogin = async (e) => {
         </p>
       </form>
 
-      <style jsx>{`
+      <style>{`
         @keyframes ping-slow {
           0%, 100% { transform: scale(1); opacity: 0.6; }
           50% { transform: scale(1.2); opacity: 0.4; }

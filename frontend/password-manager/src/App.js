@@ -33,8 +33,15 @@ function App() {
     return <LoginForm setUser={(u) => { setUser(u); goToVaultList(); }} />;
 
   // Vault List Page
-  if (page === "vaultlist")
-    return <VaultList vaults={vaults} openAddVault={goToAddVault} openVault={openVault} />;
+  if (page === "vaultlist") {
+    return (
+      <VaultList
+        vaults={vaults}          // pass the current vaults
+        openVault={openVault}    // pass function to open a vault
+        goToAddVault={goToAddVault} 
+      />
+    );
+  }
 
   // Add Vault Page
   if (page === "addVault") return <AddVault addVault={addVault} goBack={goToVaultList} />;
