@@ -1,26 +1,49 @@
 import React, { useState } from "react";
 import LoginForm from "./components/Login";
-import Dashboard from "./components/Dashboard";
-import HomePage from "./components/Home"; 
+import HomePage from "./components/Home";
+import AddVault from "./components/vault";
+import VaultList from "./components/vaultlist";
+import VaultDetail from "./components/vaultdetail"; 
 
 function App() {
   const [user, setUser] = useState(null);
-  const [showHome, setShowHome] = useState(true); // 👈 show Home first
+  const [vaults, setVaults] = useState([]);
+  const [page, setPage] = useState("home");
+  const [selectedVault, setSelectedVault] = useState(null);
 
-  // Show HomePage initially
-  if (showHome) {
-return <HomePage goToLogin={() => setShowHome(false)} />;  }
+  const goToLogin = () => setPage("login");
+  const goToVaultList = () => setPage("vaultlist");
+  const goToAddVault = () => setPage("addVault");
 
-  // Show Login or Dashboard after leaving HomePage
-  return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      {user ? (
-        <Dashboard user={user} />
-      ) : (
-        <LoginForm setUser={setUser} />
-      )}
-    </div>
-  );
+  const addVault = (vault) => {
+    setVaults([...vaults, { ...vault, id: Date.now(), passwords: [] }]);
+    goToVaultList();
+  };
+
+  const openVault = (vault) => {
+    setSelectedVault(vault);
+    setPage("vaultDetail");
+  };
+
+  // Home Page
+  if (page === "home") return <HomePage goToLogin={goToLogin} />;
+
+  // Login Page
+  if (page === "login")
+    return <LoginForm setUser={(u) => { setUser(u); goToVaultList(); }} />;
+
+  // Vault List Page
+  if (page === "vaultlist")
+    return <VaultList vaults={vaults} openAddVault={goToAddVault} openVault={openVault} />;
+
+  // Add Vault Page
+  if (page === "addVault") return <AddVault addVault={addVault} goBack={goToVaultList} />;
+
+  // Vault Detail Page
+  if (page === "vaultDetail" && selectedVault)
+    return <VaultDetail vault={selectedVault} goBack={goToVaultList} />;
+
+  return null;
 }
 
 export default App;

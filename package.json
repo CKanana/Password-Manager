@@ -1,0 +1,17 @@
+{
+  "name": "password-manager",
+  "version": "1.0.0",
+  "type":"module", 
+  "description": "Secure Password Manager with AES-GCM Encryption",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "expect.js": "^0.3.1",
+    "mocha": "^11.7.5"
+  }
+}

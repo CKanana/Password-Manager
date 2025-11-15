@@ -1,6 +1,7 @@
 // testIntegrity.js
 // Unit tests for backend correctness: padding, encryption, HMAC, checksum
-import { computeSHA256, verifyChecksum } from '../core/integrity.js';
+import { computeSHA256, verifyChecksum } from '../backend/src/core/integrity.js';
+
 
 function padPassword(password, length = 64) {
     return password.padEnd(length, '\0');
@@ -61,7 +62,7 @@ export async function runAllTests() {
 // Uncomment to run directly
 // runAllTests();
 // Test Keychain dump/load and checksum verification
-import { Keychain } from '../core/keychain.js';
+import { Keychain } from '../backend/src/core/keychain.js';
 
 async function testKeychainDumpLoad() {
     const masterPassword = 'testMaster123!';
