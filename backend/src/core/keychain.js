@@ -32,7 +32,6 @@ import {
  * Keychain Class
  * ----------------
  * Manages secure domain-password storage using AES-GCM + HMAC + PBKDF2.
- * Implements all cryptographic security measures specified in the project.
  */
 export class Keychain {
   /**
@@ -57,31 +56,25 @@ export class Keychain {
     return `PBKDF2 performed ${PBKDF2_ITERATIONS.toLocaleString()} rounds of cryptographic hashing on your password combined with the salt. Why so many rounds? To make it painfully slow for attackers trying to guess your password. If someone tries to brute-force your password by guessing millions of possibilities, each guess takes about half a second to verify. This turns a quick attack into something that would take years.`;
   }
   constructor(aesKey, hmacKey, kvs = {}, salt = null, iterations = PBKDF2_ITERATIONS) {
-    this.aesKey = aesKey;           // AES-GCM key for password encryption
-    this.hmacKey = hmacKey;         // HMAC key for domain hashing
-    this.kvs = kvs;                 // Key-Value Store: domainHMAC → { ciphertext, iv }
-    this.salt = salt;               // 128-bit salt for PBKDF2
-    this.iterations = iterations;   // PBKDF2 iteration count
+    this.aesKey = aesKey;
+    this.hmacKey = hmacKey;
+    this.kvs = kvs;
+    this.salt = salt;
+    this.iterations = iterations;
   }
 
-  // ------------------------------------------------------------
-  //  Initialize new password manager
-  // ------------------------------------------------------------
+  // Initialize a new keychain
   static async init(password) {
     const salt = generateSalt(SALT_LENGTH);
     const masterKey = await deriveMasterKey(password, salt);
     const { aesKey, hmacKey } = await deriveSubKeys(masterKey);
-
     return new Keychain(aesKey, hmacKey, {}, bufToBase64(salt), PBKDF2_ITERATIONS);
   }
 
-  // ------------------------------------------------------------
-  // Load existing keychain from JSON representation
-  // ------------------------------------------------------------
+  // Load existing keychain
   static async load(password, repr, trustedDataCheck = null) {
     const data = JSON.parse(repr);
 
-    // Verify rollback protection if trustedDataCheck is provided
     if (trustedDataCheck) {
       const valid = await verifyChecksum(repr, trustedDataCheck);
       if (!valid) throw new Error("Checksum mismatch: possible rollback attack.");
@@ -93,7 +86,7 @@ export class Keychain {
 
     const kc = new Keychain(aesKey, hmacKey, data.kvs, data.salt, data.iterations);
 
-    // Verify password correctness (try decrypting first entry if any)
+    // Test decryption of first entry (if any)
     const keys = Object.keys(kc.kvs);
     if (keys.length > 0) {
       try {
@@ -113,30 +106,28 @@ export class Keychain {
     return kc;
   }
 
-  // ------------------------------------------------------------
-  //  Save keychain to disk (serialize)
-  // ------------------------------------------------------------
+  // Dump keychain to JSON + SHA256 checksum
   async dump() {
-    const json = JSON.stringify({
-      kvs: this.kvs,
-      salt: this.salt,
-      iterations: this.iterations,
-    });
-
-    const checksum = await computeSHA256(json);
-    return [json, checksum];
+    try {
+      const json = JSON.stringify({
+        kvs: this.kvs,
+        salt: this.salt,
+        iterations: this.iterations,
+      });
+      const checksum = await computeSHA256(json);
+      return [json, checksum];
+    } catch (err) {
+      throw new Error(`Failed to dump keychain: ${err.message}`);
+    }
   }
 
-  // ------------------------------------------------------------
-  // Add or update password for a domain
-  // ------------------------------------------------------------
+  // Add or update a password
   async set(domain, password) {
     try {
       const domainBuf = strToBuf(domain);
       const domainHMAC = await computeHMAC(this.hmacKey, domainBuf);
       const domainKey = bufToBase64(domainHMAC);
 
-      // Pad password to fixed length
       const padded = password.padEnd(MAX_PASSWORD_LENGTH, " ");
       const passwordBuf = strToBuf(padded);
 
@@ -157,48 +148,39 @@ export class Keychain {
     }
   }
 
-  // ------------------------------------------------------------
-  // Retrieve password for a domain
-  // ------------------------------------------------------------
+  // Retrieve password; return null if not found
   async get(domain) {
+    const domainBuf = strToBuf(domain);
+    const domainHMAC = await computeHMAC(this.hmacKey, domainBuf);
+    const domainKey = bufToBase64(domainHMAC);
+
+    const entry = this.kvs[domainKey];
+    if (!entry) return null;
+
     try {
-      const domainBuf = strToBuf(domain);
-      const domainHMAC = await computeHMAC(this.hmacKey, domainBuf);
-      const domainKey = bufToBase64(domainHMAC);
-
-      const entry = this.kvs[domainKey];
-      if (!entry) {
-        throw new Error(`No password found for domain '${domain}'.`);
-      }
-
       const plaintextBuf = await decryptAESGCM(
         this.aesKey,
         base64ToBuf(entry.ciphertext),
         base64ToBuf(entry.iv),
         domainHMAC
       );
-      const plaintext = bufToStr(plaintextBuf).trimEnd();
-      return plaintext;
+      return bufToStr(plaintextBuf).trimEnd();
     } catch (err) {
       throw new Error(`Failed to retrieve password for domain '${domain}': ${err.message}`);
     }
   }
 
-  // ------------------------------------------------------------
-  //  Remove password entry
-  // ------------------------------------------------------------
+  // Remove password; return false if not found
   async remove(domain) {
-    try {
-      const domainBuf = strToBuf(domain);
-      const domainHMAC = await computeHMAC(this.hmacKey, domainBuf);
-      const domainKey = bufToBase64(domainHMAC);
+    const domainBuf = strToBuf(domain);
+    const domainHMAC = await computeHMAC(this.hmacKey, domainBuf);
+    const domainKey = bufToBase64(domainHMAC);
 
-      if (this.kvs[domainKey]) {
-        delete this.kvs[domainKey];
-        return true;
-      } else {
-        throw new Error(`No password found for domain '${domain}' to remove.`);
-      }
+    if (!this.kvs[domainKey]) return false;
+
+    try {
+      delete this.kvs[domainKey];
+      return true;
     } catch (err) {
       throw new Error(`Failed to remove password for domain '${domain}': ${err.message}`);
     }

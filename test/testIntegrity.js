@@ -1,9 +1,7 @@
 // testIntegrity.js
 // Unit tests for backend correctness: padding, encryption, HMAC, checksum
-import { computeSHA256, verifyChecksum } from '../core/integrity.js';
-import { Keychain } from '../core/keychain.js';
-import { strToBuf, bufToStr, bufToBase64, base64ToBuf } from '../core/encodingUtils.js';
-import { generateSalt, deriveMasterKey, deriveSubKeys, encryptAESGCM, decryptAESGCM, generateIV } from '../core/cryptoUtils.js';
+import { computeSHA256, verifyChecksum } from '../backend/src/core/integrity.js';
+
 
 function padPassword(password, length = 64) {
     return password.padEnd(length, '\0');
@@ -203,6 +201,7 @@ async function testCryptoOutputs() {
     console.log('Output 4: AES Key (Base64):', btoa(String.fromCharCode(...new Uint8Array(aesKeyRaw))));
 }
 // Test Keychain dump/load and checksum verification
+import { Keychain } from '../backend/src/core/keychain.js';
 
 async function testKeychainDumpLoad() {
     const masterPassword = 'testMaster123!';

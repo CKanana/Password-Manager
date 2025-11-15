@@ -34,7 +34,7 @@ export default function HomePage({ goToLogin, goToDemo }) {
       <main className="flex flex-col md:flex-row items-center justify-between w-full max-w-6xl mt-36 z-10">
         {/* Left Content */}
         <div className="max-w-lg">
-          <h1 className="text-6xl text-white md:text-6xl font-extrabold leading-tight mb-4">
+          <h1 className="text-4xl text-white md:text-4xl font-extrabold leading-tight mb-4">
             Your Passwords, <br />
             Secured in One Vault.
           </h1>
