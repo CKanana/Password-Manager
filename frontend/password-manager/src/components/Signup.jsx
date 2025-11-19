@@ -21,7 +21,6 @@ function SignupForm({ setUser, goToLogin }) {
     // ...existing code...
   }
 
-  export default SignupForm;
     try {
       const res = await fetch("https://password-manager-7p65.onrender.com/auth/signup", {
         method: "POST",
@@ -100,6 +99,7 @@ function SignupForm({ setUser, goToLogin }) {
         </p>
       </form>
     </div>
-  }
+  );
+}
 
-  export default SignupForm;
+export default SignupForm;
