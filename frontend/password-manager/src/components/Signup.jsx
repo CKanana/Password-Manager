@@ -97,3 +97,6 @@ function SignupForm({ setUser, goToLogin }) {
         </p>
       </form>
     </div>
+    }
+
+    export default SignupForm;
