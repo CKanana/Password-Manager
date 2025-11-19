@@ -234,3 +234,4 @@ async function testKeychainDumpLoad() {
 }
 
 runAllTests();
+import { generateSalt, deriveMasterKey, deriveSubKeys, encryptAESGCM, decryptAESGCM, generateIV } from '../backend/src/core/cryptoUtils.js';

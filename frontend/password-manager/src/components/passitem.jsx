@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-function PasswordItem({ site, username, password }) {
+function PasswordItem({ site, username, password, onDelete }) {
   const [show, setShow] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -40,6 +40,12 @@ function PasswordItem({ site, username, password }) {
             className="bg-purple-200 hover:bg-black text-black px-3 py-1.5 rounded-xl transition-colors"
           >
             Copy
+          </button>
+          <button
+            onClick={onDelete}
+            className="bg-red-500 hover:bg-red-700 text-white px-3 py-1.5 rounded-xl transition-colors"
+          >
+            Delete
           </button>
         </div>
         {copied && (

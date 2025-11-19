@@ -51,7 +51,7 @@ export async function deriveMasterKey(password, salt, iterations = PBKDF2_ITERAT
     },
     keyMaterial,
     { name: "HMAC", hash: "SHA-256", length: 256 },
-    true,
+    false,
     ["sign"]
   );
 

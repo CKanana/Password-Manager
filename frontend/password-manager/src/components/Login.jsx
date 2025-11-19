@@ -1,33 +1,37 @@
 import React, { useState } from "react";
 import { Key } from "lucide-react";
 
-function LoginForm({ setUser }) {
+function LoginForm({ setUser, goToSignup }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-const handleLogin = async (e) => {
-  e.preventDefault();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  try {
-    const res = await fetch("http://localhost:5000/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password })
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      alert(data.message || "Login failed");
-      return;
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    setSuccess("");
+    try {
+      const res = await fetch("http://localhost:5000/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.message || "Login failed");
+        setLoading(false);
+        return;
+      }
+      setUser(data.user);
+      setSuccess("Login successful!");
+    } catch (err) {
+      setError("Something went wrong. Try again.");
     }
-
-    // Save the logged-in user
-    setUser(data.user);  
-  } catch (err) {
-    console.error("Login error:", err);
-    alert("Something went wrong. Try again.");
-  }
-};
+    setLoading(false);
+  };
 
   
   return (
@@ -58,6 +62,8 @@ const handleLogin = async (e) => {
         <p className="text-gray-400 text-center text-lg mb-6">
           Log in to your secure PassVault
         </p>
+        {error && <div className="text-red-400 text-center mb-4">{error}</div>}
+        {success && <div className="text-green-400 text-center mb-4">{success}</div>}
 
         <input
           type="email"
@@ -83,21 +89,21 @@ const handleLogin = async (e) => {
 
         <button
           type="submit"
-          className="w-full max-w-md bg-purple-600 hover:bg-purple-700 text-gray-100 py-4 rounded-full
-                     font-semibold transition-all duration-300 shadow-lg hover:shadow-purple-600/40"
+          className="w-full max-w-md bg-purple-600 hover:bg-purple-700 text-gray-100 py-4 rounded-full font-semibold transition-all duration-300 shadow-lg hover:shadow-purple-600/40"
+          disabled={loading}
         >
-          Log In
+          {loading ? "Logging In..." : "Log In"}
         </button>
 
         <p className="text-center text-lg text-gray-400 mt-6">
           Don’t have an account?{" "}
-          <span className="text-purple-400 hover:underline cursor-pointer">
+          <span className="text-purple-400 hover:underline cursor-pointer" onClick={goToSignup}>
             Sign Up
           </span>
         </p>
       </form>
 
-      <style jsx>{`
+      <style>{`
         @keyframes ping-slow {
           0%, 100% { transform: scale(1); opacity: 0.6; }
           50% { transform: scale(1.2); opacity: 0.4; }

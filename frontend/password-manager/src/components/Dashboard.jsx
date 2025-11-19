@@ -2,17 +2,67 @@ import React, { useState } from "react";
 import PasswordItem from "./passitem";
 import AddPasswordForm from "./passform";
 
+import { useEffect } from "react";
+
 function Dashboard({ user }) {
   const [passwords, setPasswords] = useState([]);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [vaultId, setVaultId] = useState(null);
+  const [success, setSuccess] = useState("");
 
-  if (!user) return <p>Loading...</p>;
+  useEffect(() => {
+    async function fetchVault() {
+      try {
+        const res = await fetch(`http://localhost:5000/api/vaults?userEmail=${user.email}`);
+        const data = await res.json();
+        if (data.vaults && data.vaults.length > 0) {
+          setPasswords(data.vaults[0].passwords || []);
+          setVaultId(data.vaults[0]._id);
+        } else {
+          setPasswords([]);
+          setVaultId(null);
+        }
+      } catch {
+        setError("Failed to fetch vault");
+      }
+    }
+    if (user?.email) fetchVault();
+  }, [user]);
 
-  const addPassword = (entry) => {
-    setPasswords([...passwords, entry]);
-    setMessage("Password added!");
-    setTimeout(() => setMessage(""), 2000);
+  const syncVault = async (newPasswords) => {
+    try {
+      const res = await fetch("http://localhost:5000/api/vaults", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userEmail: user.email,
+          vaultName: "default",
+          description: "User vault",
+          passwords: newPasswords
+        })
+      });
+      const data = await res.json();
+      setVaultId(data.vault._id);
+    } catch {
+      setError("Failed to sync vault");
+    }
+  };
+
+  const addPassword = async (entry) => {
+    const updated = [...passwords, entry];
+    setPasswords(updated);
+  setSuccess("Password added!");
+  setTimeout(() => { setSuccess(""); setMessage(""); }, 2000);
+    await syncVault(updated);
+  };
+
+  const deletePassword = async (index) => {
+    const updated = passwords.filter((_, i) => i !== index);
+    setPasswords(updated);
+  setSuccess("Password deleted!");
+  setTimeout(() => { setSuccess(""); setMessage(""); }, 2000);
+    await syncVault(updated);
   };
 
   // Export vault as JSON
@@ -75,11 +125,12 @@ function Dashboard({ user }) {
         </h1>
 
         {/* Notifications */}
-        {message && <div className="text-green-400 text-center mb-2">{message}</div>}
-        {error && <div className="text-red-400 text-center mb-2">{error}</div>}
+  {message && <div className="text-green-400 text-center mb-2">{message}</div>}
+  {error && <div className="text-red-400 text-center mb-2">{error}</div>}
+  {success && <div className="text-green-400 text-center mb-2">{success}</div>}
 
-        {/* Vault Export/Import */}
-        <div className="flex gap-4 justify-center mb-6">
+  {/* Vault Export/Import/Delete */}
+  <div className="flex gap-4 justify-center mb-6">
           <button
             onClick={exportVault}
             className="bg-purple-700 hover:bg-purple-800 text-white px-5 py-2 rounded-full font-semibold shadow-md transition"
@@ -90,13 +141,29 @@ function Dashboard({ user }) {
             Import Vault
             <input type="file" accept="application/json" onChange={importVault} className="hidden" />
           </label>
+          {vaultId && (
+            <button
+              onClick={async () => {
+                await fetch(`http://localhost:5000/api/vaults/${vaultId}`, { method: "DELETE" });
+                setPasswords([]);
+                setVaultId(null);
+                setMessage("Vault deleted!");
+                setTimeout(() => setMessage(""), 2000);
+              }}
+              className="bg-red-600 hover:bg-red-800 text-white px-5 py-2 rounded-full font-semibold shadow-md transition"
+            >
+              Delete Vault
+            </button>
+          )}
         </div>
 
         <AddPasswordForm addPassword={addPassword} />
 
         <div className="mt-8 space-y-4">
           {passwords.length > 0 ? (
-            passwords.map((p, i) => <PasswordItem key={i} {...p} />)
+            passwords.map((p, i) => (
+              <PasswordItem key={i} {...p} onDelete={() => deletePassword(i)} />
+            ))
           ) : (
             <p className="text-center text-gray-400 italic">No passwords saved yet.</p>
           )}
