@@ -14,6 +14,11 @@ function SignupForm({ setUser, goToLogin }) {
     setLoading(true);
     setError("");
     setSuccess("");
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      setLoading(false);
+      return;
+    }
     try {
       const res = await fetch("https://password-manager-7p65.onrender.com/auth/signup", {
         method: "POST",
@@ -91,28 +96,4 @@ function SignupForm({ setUser, goToLogin }) {
           <span className="text-purple-400 hover:underline cursor-pointer" onClick={goToLogin}>Log In</span>
         </p>
       </form>
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      setLoading(false);
-      return;
-    }
-    try {
-      const res = await fetch("https://password-manager-7p65.onrender.com/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.message || "Signup failed");
-        setLoading(false);
-        return;
-      }
-      setSuccess("Signup successful! Please log in.");
-      setTimeout(() => {
-        goToLogin();
-      }, 1200);
-    } catch (err) {
-      setError("Something went wrong. Try again.");
-    }
-    setLoading(false);
+    </div>
