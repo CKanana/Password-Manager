@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Key } from "lucide-react";
 
 function LoginForm({ setUser, goToSignup }) {
+    const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -75,16 +76,27 @@ function LoginForm({ setUser, goToSignup }) {
           required
         />
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full p-4 mb-6 rounded-lg bg-black/40 border border-purple-700/40
-                     text-gray-200 placeholder-purple-300 focus:outline-none focus:ring-2
-                     focus:ring-purple-500 transition"
-          required
-        />
+        <div className="relative w-full mb-6">
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full p-4 rounded-lg bg-black/40 border border-purple-700/40 text-gray-200 placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 transition pr-12"
+            required
+          />
+          <span
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer text-purple-400"
+            onClick={() => setShowPassword((v) => !v)}
+            title={showPassword ? "Hide password" : "Show password"}
+          >
+            {showPassword ? (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-4.477-10-10a9.96 9.96 0 012.175-6.125M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+            )}
+          </span>
+        </div>
 
         <button
           type="submit"

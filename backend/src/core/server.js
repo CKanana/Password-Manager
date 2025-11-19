@@ -8,7 +8,13 @@ import { connectDB } from "./db.js";
 
 connectDB();
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: [
+    "https://vaultpassword.netlify.app",
+    "https://password-manager-7p65.onrender.com"
+  ],
+  credentials: true
+}));
 app.use(express.json());
 
 app.get("/api/status", (req, res) => {
