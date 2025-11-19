@@ -14,7 +14,7 @@ function Dashboard({ user }) {
   useEffect(() => {
     async function fetchVault() {
       try {
-        const res = await fetch(`http://localhost:5000/api/vaults?userEmail=${user.email}`);
+        const res = await fetch(`https://password-manager-7p65.onrender.com/api/vaults?userEmail=${user.email}`);
         const data = await res.json();
         if (data.vaults && data.vaults.length > 0) {
           setPasswords(data.vaults[0].passwords || []);
@@ -32,7 +32,7 @@ function Dashboard({ user }) {
 
   const syncVault = async (newPasswords) => {
     try {
-      const res = await fetch("http://localhost:5000/api/vaults", {
+      const res = await fetch("https://password-manager-7p65.onrender.com/api/vaults", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -144,7 +144,7 @@ function Dashboard({ user }) {
           {vaultId && (
             <button
               onClick={async () => {
-                await fetch(`http://localhost:5000/api/vaults/${vaultId}`, { method: "DELETE" });
+                await fetch(`https://password-manager-7p65.onrender.com/api/vaults/${vaultId}`, { method: "DELETE" });
                 setPasswords([]);
                 setVaultId(null);
                 setMessage("Vault deleted!");

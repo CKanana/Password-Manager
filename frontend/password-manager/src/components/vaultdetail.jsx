@@ -16,7 +16,7 @@ function VaultDetail({ vault, goBack }) {
   useEffect(() => {
     const checkVault = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/vault/exists");
+        const res = await fetch("https://password-manager-7p65.onrender.com/api/vault/exists");
         const data = await res.json();
         setVaultExists(data.exists);
       } catch (err) {
@@ -28,7 +28,7 @@ function VaultDetail({ vault, goBack }) {
 
   const initVault = async (password, loadExisting) => {
     try {
-      const res = await fetch("http://localhost:5000/api/vault/init", {
+      const res = await fetch("https://password-manager-7p65.onrender.com/api/vault/init", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ masterPassword: password, loadExisting }),
@@ -60,7 +60,7 @@ function VaultDetail({ vault, goBack }) {
 
   const fetchPasswords = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/vault/passwords");
+      const res = await fetch("https://password-manager-7p65.onrender.com/api/vault/passwords");
       const data = await res.json();
       setPasswords(data.passwords || []);
     } catch (err) {
@@ -73,7 +73,7 @@ function VaultDetail({ vault, goBack }) {
     if (!site || !password) return;
 
     try {
-      const res = await fetch("http://localhost:5000/api/vault/password", {
+      const res = await fetch("https://password-manager-7p65.onrender.com/api/vault/password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ domain: site, password, username }),

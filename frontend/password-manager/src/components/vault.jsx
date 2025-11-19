@@ -12,7 +12,7 @@ function AddVaultForm({ addVault }) {
 
     // Initialize vault on backend
     try {
-      const res = await fetch("http://localhost:5000/api/vault/init", {
+      const res = await fetch("https://password-manager-7p65.onrender.com/api/vault/init", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ masterPassword, loadExisting: false }),
