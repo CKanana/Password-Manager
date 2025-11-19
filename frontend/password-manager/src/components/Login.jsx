@@ -38,19 +38,16 @@ function LoginForm({ setUser, goToSignup }) {
     <div className="relative h-screen w-screen flex items-center justify-center overflow-hidden
                     bg-gradient-to-br from-purple-900 via-black to-purple-800">
 
-      {/* Animated Background Glows */}
-      <div className="absolute w-[500px] h-[500px] bg-purple-700/50 rounded-full filter blur-3xl 
-                      animate-ping-slow top-[-200px] left-[-200px]" />
-      <div className="absolute w-[600px] h-[600px] bg-purple-500/40 rounded-full filter blur-3xl 
-                      animate-ping-slower bottom-[-300px] right-[-300px]" />
-      <div className="absolute w-[400px] h-[400px] bg-purple-600/30 rounded-full filter blur-3xl 
-                      animate-ping-slow top-[100px] right-[-150px]" />
+      {/* Animated Background */}
+      <div className="absolute w-[500px] h-[500px] bg-purple-700/50 rounded-full filter blur-3xl animate-ping-slow top-[-200px] left-[-200px]" />
+      <div className="absolute w-[600px] h-[600px] bg-purple-500/40 rounded-full filter blur-3xl animate-ping-slower bottom-[-300px] right-[-300px]" />
+      <div className="absolute w-[400px] h-[400px] bg-purple-600/30 rounded-full filter blur-3xl animate-ping-slow top-[100px] right-[-150px]" />
 
-      {/* Login Form covering entire screen */}
+      {/* Login Form */}
       <form
         onSubmit={handleLogin}
         className="relative z-10 flex flex-col items-center justify-center h-full w-full
-                   bg-black/40 backdrop-blur-xl border border-purple-700/40 text-gray-200 p-8"
+                   bg-black/40 backdrop-blur-xl border border-purple-700/40 text-gray-200 p-8 max-w-md"
       >
         <div className="flex items-center justify-center mb-6">
           <Key size={60} className="text-purple-400 animate-bounce-slow" />
@@ -70,7 +67,7 @@ function LoginForm({ setUser, goToSignup }) {
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full max-w-md p-4 mb-4 rounded-lg bg-black/40 border border-purple-700/40
+          className="w-full p-4 mb-4 rounded-lg bg-black/40 border border-purple-700/40
                      text-gray-200 placeholder-purple-300 focus:outline-none focus:ring-2
                      focus:ring-purple-500 transition"
           required
@@ -81,7 +78,7 @@ function LoginForm({ setUser, goToSignup }) {
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full max-w-md p-4 mb-6 rounded-lg bg-black/40 border border-purple-700/40
+          className="w-full p-4 mb-6 rounded-lg bg-black/40 border border-purple-700/40
                      text-gray-200 placeholder-purple-300 focus:outline-none focus:ring-2
                      focus:ring-purple-500 transition"
           required
@@ -103,6 +100,7 @@ function LoginForm({ setUser, goToSignup }) {
         </p>
       </form>
 
+      <style>{`
       <style>{`
         @keyframes ping-slow {
           0%, 100% { transform: scale(1); opacity: 0.6; }
