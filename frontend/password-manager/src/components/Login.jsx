@@ -56,11 +56,13 @@ function LoginForm({ setUser, goToSignup }) {
         <h2 className="text-4xl font-bold text-center mb-4 text-purple-300">
           Welcome Back
         </h2>
-        <p className="text-gray-400 text-center text-lg mb-6">
-          Log in to your secure PassVault
-        </p>
-        {error && <div className="text-red-400 text-center mb-4">{error}</div>}
-        {success && <div className="text-green-400 text-center mb-4">{success}</div>}
+
+        {error && (
+          <div className="w-full text-center text-red-400 mb-4">{error}</div>
+        )}
+        {success && (
+          <div className="w-full text-center text-green-400 mb-4">{success}</div>
+        )}
 
         <input
           type="email"
@@ -100,7 +102,7 @@ function LoginForm({ setUser, goToSignup }) {
         </p>
       </form>
 
-      <style>{`
+      {/* Custom Animations */}
       <style>{`
         @keyframes ping-slow {
           0%, 100% { transform: scale(1); opacity: 0.6; }
